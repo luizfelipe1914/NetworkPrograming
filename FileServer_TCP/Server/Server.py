@@ -23,7 +23,7 @@ def send_list_files(con, lista):
 
 def send_length(con, length):
     try:
-        con.sendall(struct.pack("!h", length))
+        con.sendall(struct.pack("!I", length))
     except Exception as exc:
         print(exc)
         
@@ -86,13 +86,13 @@ def main():
                 break
             else:
                 con.send(struct.pack("!h", 1))
-                print(f'O cliente {client[0]} enviou {struct.unpack("!I", res)[0]}')
+                print(f'O cliente {client[0]} enviou {struct.unpack("!h", res)[0]}')
                 command = struct.unpack("!h", res)[0]
                 if(command == 1):
                     print(f"O cliente {client[0]} solicitou a listagem dos arquivos")
                     send_length(con, len(list_files()))
                     send_list_files(con, list_files())
-                elif(res == 2):
+                elif(command == 2):
                     data = con.recv(4)
                     if(not data):
                         break
@@ -103,6 +103,7 @@ def main():
                         if(not name_file):
                             break
                         else:
+                            print(f"O cliente {client[0]} solicitou o arquivo {name_file.decode('UTF-8')}")
                             if(file_exists(name_file.decode("UTF-8"))):
                                 while(len(name_file) < len_file):
                                     name_file+=con.recv(len_file)
@@ -115,7 +116,8 @@ def main():
                                     send_file(con, name_file, inicio, fim)
                             else:
                                 con.send(struct.pack("!h", 3)) 
-                    
+                else:
+                    con.send(struct.pack("!h", 2))   
     tcp.close()
 
 
