@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from operator import length_hint
 import socket
 import sys
 import ssl
@@ -120,15 +119,18 @@ def main():
     elif(len(param) == 7):
         if(param["flag"] == "-p"):
             data = read_parameters_from_cli()          
+      
         elif(param["flag"] == "-f"):
             data = read_parameters_from_file(param["INPUT"])
         else:
             print(f"Sintaxe Incorreta!\n python TCPClient-V5-params.py <HOST> <PORT>  <RESOURCE> -o <OUTPUT FILE>  [ -p <DADOS> | -f <INPUT FILE> ]")        
+        
         if(param["PORT"] == 80):
             sock = create_socket(param["HOST"], param["PORT"])
             send_http_POST(sock, param["HOST"], param["RESOURCE"], data)
             body = getResponse(sock)
             write_data(param["OUTPUT_FILE"], body)
+            
         elif(param["PORT"] == 443):
             sock = wrap_soquete(create_socket(param["HOST"], param["PORT"]), param["HOST"])
             send_http_POST(sock, param["HOST"], param["RESOURCE"], data)
